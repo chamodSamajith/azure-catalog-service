@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "ctpcOyi7aGA=",
+  "success": true,
+  "projectFilePath": "/Users/chamodrathnayake/Documents/Projects/Test/azure-catalog-service/src/CatalogApi/CatalogApi.csproj",
+  "expectedPackageFiles": [
+    "/Users/chamodrathnayake/.nuget/packages/microsoft.aspnetcore.openapi/9.0.6/microsoft.aspnetcore.openapi.9.0.6.nupkg.sha512",
+    "/Users/chamodrathnayake/.nuget/packages/microsoft.openapi/1.6.17/microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}
