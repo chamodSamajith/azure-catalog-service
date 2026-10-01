@@ -2,6 +2,8 @@ using CatalogApi.Data.Repositories;
 using CatalogApi.DTOs;
 using CatalogApi.Models;
 using FluentValidation;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CatalogApi.Endpoints;
 
