@@ -17,6 +17,7 @@ var connectionString = builder.Configuration.GetConnectionString("CatalogDb");
 // Add services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpLogging();
 
 // EF Core & Database
 if (databaseProvider.Equals("SqlServer", StringComparison.OrdinalIgnoreCase))
@@ -137,3 +138,5 @@ var port = builder.Configuration.GetValue<int?>("PORT") ?? 8080;
 app.Urls.Add($"http://0.0.0.0:{port}");
 
 app.Run();
+
+public partial class Program { }

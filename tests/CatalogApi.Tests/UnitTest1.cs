@@ -1,7 +1,9 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
 using CatalogApi.Data;
 using CatalogApi.DTOs;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace CatalogApi.Tests;
@@ -14,6 +16,7 @@ public class ProductEndpointsTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         _client = _factory.CreateClient();
+        await Task.CompletedTask;
     }
 
     public async Task DisposeAsync()
@@ -298,4 +301,13 @@ public class ProductEndpointsTests : IAsyncLifetime
     }
 
     #endregion
+}
+
+public static class HttpContentExtensions
+{
+    public static async Task<T?> ReadAsAsync<T>(this HttpContent content)
+    {
+        var json = await content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+    }
 }
