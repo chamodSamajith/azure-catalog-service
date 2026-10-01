@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CatalogApi.Tests;
@@ -29,6 +30,20 @@ public class CatalogApiWebApplicationFactory : WebApplicationFactory<Program>
             services.AddDbContext<ProductsDbContext>(options =>
                 options.UseSqlite(_connection)
             );
+
+            // Disable migration running for tests
+            var configDescriptor = services.SingleOrDefault(d =>
+                d.ServiceType == typeof(IConfiguration));
+            if (configDescriptor is not null)
+                services.Remove(configDescriptor);
+
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    { "Database:ApplyMigrationsOnStartup", "false" }
+                })
+                .Build();
+            services.AddSingleton<IConfiguration>(config);
 
             // Create and seed the database
             var sp = services.BuildServiceProvider();
