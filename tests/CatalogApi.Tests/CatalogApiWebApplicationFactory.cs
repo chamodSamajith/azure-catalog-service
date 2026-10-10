@@ -1,4 +1,5 @@
 using CatalogApi.Data;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
@@ -44,6 +45,17 @@ public class CatalogApiWebApplicationFactory : WebApplicationFactory<Program>
                 })
                 .Build();
             services.AddSingleton<IConfiguration>(config);
+
+            // Replace real Entra ID auth with a fake scheme so tests don't need real tokens
+            services.AddAuthentication(TestAuthHandler.SchemeName)
+                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, options => { });
+
+            services.PostConfigure<AuthenticationOptions>(options =>
+            {
+                options.DefaultAuthenticateScheme = TestAuthHandler.SchemeName;
+                options.DefaultChallengeScheme = TestAuthHandler.SchemeName;
+                options.DefaultScheme = TestAuthHandler.SchemeName;
+            });
 
             // Create and seed the database
             var sp = services.BuildServiceProvider();

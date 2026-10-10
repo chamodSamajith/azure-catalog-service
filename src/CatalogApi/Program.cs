@@ -7,6 +7,8 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Identity.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +43,12 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 // Validators
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+// Authentication: Microsoft Entra ID validates JWT bearer tokens.
+// TenantId "common" (set in AzureAd:TenantId) accepts both work/school and personal Microsoft accounts.
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+builder.Services.AddAuthorization();
 
 // Application Insights (if connection string is configured)
 var appInsightsConnectionString = builder.Configuration.GetValue<string>("APPLICATIONINSIGHTS_CONNECTION_STRING");
@@ -92,7 +100,17 @@ using (var scope = app.Services.CreateScope())
 
     if (shouldApplyMigrations)
     {
-        await dbContext.Database.MigrateAsync();
+        // The migration files target SQL Server syntax (Phase 5). SQLite accepts that SQL
+        // without erroring but doesn't apply its auto-increment semantics correctly, so local
+        // dev uses EnsureCreated instead — it builds the schema straight from the C# model.
+        if (databaseProvider.Equals("SqlServer", StringComparison.OrdinalIgnoreCase))
+        {
+            await dbContext.Database.MigrateAsync();
+        }
+        else
+        {
+            await dbContext.Database.EnsureCreatedAsync();
+        }
 
         // Seed sample products in Development
         if (app.Environment.IsDevelopment() && !await dbContext.Products.AnyAsync())
@@ -127,12 +145,12 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// Authentication & Authorization (Microsoft Entra ID)
+app.UseAuthentication();
+app.UseAuthorization();
+
 // Endpoints
 app.MapProductEndpoints();
-
-// Placeholder for authentication (to be added later with Entra ID)
-// app.UseAuthentication();
-// app.UseAuthorization();
 
 var port = builder.Configuration.GetValue<int?>("PORT") ?? 8080;
 app.Urls.Add($"http://0.0.0.0:{port}");

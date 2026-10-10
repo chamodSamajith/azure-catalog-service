@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using CatalogApi.Data;
@@ -16,6 +17,8 @@ public class ProductEndpointsTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         _client = _factory.CreateClient();
+        // CRUD tests assume an authenticated caller; TestAuthHandler accepts any Authorization header.
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "test-token");
         await Task.CompletedTask;
     }
 
@@ -261,6 +264,21 @@ public class ProductEndpointsTests : IAsyncLifetime
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    #endregion
+
+    #region Authentication
+
+    [Fact]
+    public async Task GetProducts_WithoutAuthHeader_ReturnsUnauthorized()
+    {
+        using var unauthenticatedClient = _factory.CreateClient();
+        // Deliberately no Authorization header
+
+        var response = await unauthenticatedClient.GetAsync("/api/products");
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
     #endregion

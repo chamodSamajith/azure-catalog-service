@@ -177,3 +177,17 @@
 /Users/chamodrathnayake/Documents/Projects/Test/azure-catalog-service/src/CatalogApi/obj/Debug/net9.0/CatalogApi.pdb
 /Users/chamodrathnayake/Documents/Projects/Test/azure-catalog-service/src/CatalogApi/obj/Debug/net9.0/CatalogApi.genruntimeconfig.cache
 /Users/chamodrathnayake/Documents/Projects/Test/azure-catalog-service/src/CatalogApi/obj/Debug/net9.0/ref/CatalogApi.dll
+/Users/chamodrathnayake/Documents/Projects/Test/azure-catalog-service/src/CatalogApi/bin/Debug/net9.0/Azure.Security.KeyVault.Certificates.dll
+/Users/chamodrathnayake/Documents/Projects/Test/azure-catalog-service/src/CatalogApi/bin/Debug/net9.0/Azure.Security.KeyVault.Secrets.dll
+/Users/chamodrathnayake/Documents/Projects/Test/azure-catalog-service/src/CatalogApi/bin/Debug/net9.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/Users/chamodrathnayake/Documents/Projects/Test/azure-catalog-service/src/CatalogApi/bin/Debug/net9.0/Microsoft.AspNetCore.Authentication.OpenIdConnect.dll
+/Users/chamodrathnayake/Documents/Projects/Test/azure-catalog-service/src/CatalogApi/bin/Debug/net9.0/Microsoft.Identity.Abstractions.dll
+/Users/chamodrathnayake/Documents/Projects/Test/azure-catalog-service/src/CatalogApi/bin/Debug/net9.0/Microsoft.Identity.Web.dll
+/Users/chamodrathnayake/Documents/Projects/Test/azure-catalog-service/src/CatalogApi/bin/Debug/net9.0/Microsoft.Identity.Web.Certificate.dll
+/Users/chamodrathnayake/Documents/Projects/Test/azure-catalog-service/src/CatalogApi/bin/Debug/net9.0/Microsoft.Identity.Web.Certificateless.dll
+/Users/chamodrathnayake/Documents/Projects/Test/azure-catalog-service/src/CatalogApi/bin/Debug/net9.0/Microsoft.Identity.Web.Diagnostics.dll
+/Users/chamodrathnayake/Documents/Projects/Test/azure-catalog-service/src/CatalogApi/bin/Debug/net9.0/Microsoft.Identity.Web.TokenAcquisition.dll
+/Users/chamodrathnayake/Documents/Projects/Test/azure-catalog-service/src/CatalogApi/bin/Debug/net9.0/Microsoft.Identity.Web.TokenCache.dll
+/Users/chamodrathnayake/Documents/Projects/Test/azure-catalog-service/src/CatalogApi/bin/Debug/net9.0/Microsoft.IdentityModel.LoggingExtensions.dll
+/Users/chamodrathnayake/Documents/Projects/Test/azure-catalog-service/src/CatalogApi/bin/Debug/net9.0/Microsoft.IdentityModel.Validators.dll
+/Users/chamodrathnayake/Documents/Projects/Test/azure-catalog-service/src/CatalogApi/bin/Debug/net9.0/System.ClientModel.dll

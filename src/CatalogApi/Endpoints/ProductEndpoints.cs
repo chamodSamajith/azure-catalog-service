@@ -13,7 +13,8 @@ public static class ProductEndpoints
     {
         var group = app.MapGroup("/api/products")
             .WithName("Products")
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization();
 
         group.MapGet("/", GetProducts)
             .WithName("GetProducts")
