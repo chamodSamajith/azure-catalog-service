@@ -1,6 +1,13 @@
 terraform {
   required_version = ">= 1.9"
 
+    backend "azurerm" {
+    resource_group_name  = "catalog-rg-tf-state"
+    storage_account_name = "sttfstatecatalog"
+    container_name       = "tfstate"
+    key                  = "catalog.terraform.tfstate"
+  }
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -12,6 +19,7 @@ terraform {
     }
   }
 }
+
 
 provider "azurerm" {
   features {}
