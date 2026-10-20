@@ -45,3 +45,9 @@ variable "my_ip" {
   description = "Your IP address, for the SQL firewall allow rule"
   type        = string
 }
+
+variable "azuread_client_id" {
+  description = "Client ID of the Entra ID API app registration (CatalogApi)"
+  type        = string
+  default     = "ec99e890-c673-46c7-8d84-cc3db40275af"
+}
