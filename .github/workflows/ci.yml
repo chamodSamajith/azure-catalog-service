@@ -89,3 +89,38 @@ jobs:
       - name: Fail if plan errored
         if: steps.plan.outcome == 'failure'
         run: exit 1
+
+  deploy:
+    name: Deploy to Azure (catalog-api-tf)
+    runs-on: ubuntu-latest
+    needs: [build-test, terraform-plan]
+    # Only deploy on an actual push to main — never on a pull request, where
+    # the code hasn't been reviewed/merged yet.
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Publish
+        run: dotnet publish src/CatalogApi/CatalogApi.csproj -c Release -o ./publish
+
+      - name: Zip artifact
+        run: cd publish && zip -r ../publish.zip . -x "*.db" "*.db-shm" "*.db-wal"
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Web App
+        run: |
+          az webapp deploy \
+            --resource-group catalog-rg-tf \
+            --name catalog-api-tf \
+            --src-path publish.zip \
+            --type zip
