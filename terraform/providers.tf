@@ -6,6 +6,7 @@ terraform {
     storage_account_name = "sttfstatecatalog"
     container_name       = "tfstate"
     key                  = "catalog.terraform.tfstate"
+    use_azuread_auth     = true
   }
 
   required_providers {
