@@ -216,6 +216,64 @@ docker run -p 8080:8080 \
 - Listens on port 8080
 - Multi-stage build keeps final image small (~300MB)
 
+## Cloud Architecture & Deployment
+
+CatalogApi runs on Azure, fully provisioned via **Terraform** and deployed via **GitHub Actions** — no manual portal clicks, no stored cloud secrets, and no passwords in configuration.
+
+```mermaid
+flowchart TB
+    subgraph GitHub["GitHub"]
+        Push["Push to main"]
+        Actions["GitHub Actions CI/CD"]
+    end
+
+    subgraph Azure["Azure (australiaeast)"]
+        subgraph Identity["Microsoft Entra ID"]
+            EntraApp["App Registration\n(CatalogApi)"]
+            OIDC["OIDC Federated Credential\n(GitHub ↔ Azure, no secrets)"]
+        end
+
+        subgraph Compute["App Service (F1 / Free tier)"]
+            WebApp["catalog-api-tf\nManaged Identity"]
+        end
+
+        subgraph Data["Azure SQL (Serverless, Free limit)"]
+            SqlDb[("CatalogDb\nauto-pause enabled")]
+        end
+
+        State[("Storage Account\nTerraform remote state")]
+    end
+
+    Client["Postman / Swagger\n(OAuth2 user sign-in)"]
+
+    Push --> Actions
+    Actions -- "terraform plan\n(validate only)" --> State
+    Actions -- "OIDC login, zip deploy" --> WebApp
+    Actions -. "build & test" .-> Actions
+
+    Client -- "Bearer token" --> EntraApp
+    EntraApp -- "validates JWT" --> WebApp
+    WebApp -- "Managed Identity token\n(passwordless)" --> SqlDb
+    OIDC -.-> Actions
+```
+
+### How it's deployed
+
+1. **Infrastructure as code** — every Azure resource (resource group, SQL server/database, App Service plan, web app, firewall rules) is declared in Terraform under `terraform/`. State is stored remotely in an Azure Storage account, authenticated via Azure AD (no storage account keys). `terraform plan` shows zero drift at all times — the live environment matches the code exactly.
+
+2. **CI/CD pipeline** (`.github/workflows/ci.yml`) runs on every push to `main`:
+   - **Build & test** — restores, builds, and runs the full xUnit test suite.
+   - **Terraform validate & plan** — checks formatting, validates syntax, and runs a dry-run plan against the real Azure environment.
+   - **Deploy** — publishes the API and zip-deploys it straight to the App Service.
+
+3. **No stored cloud credentials** — GitHub authenticates to Azure using **OpenID Connect (OIDC) federation**: a short-lived token is issued per workflow run and exchanged for Azure access, scoped with least-privilege roles (read-only for planning, deploy-only on the specific web app). There is no Azure client secret sitting in GitHub at all.
+
+4. **Passwordless database access** — the Web App authenticates to Azure SQL using its own **system-assigned managed identity**, not a username/password. The identity is granted access inside the database as a contained user (`CREATE USER ... FROM EXTERNAL PROVIDER`), scoped to `db_datareader`/`db_datawriter` only.
+
+5. **User authentication** — API callers (Postman, Swagger, or a real client) sign in via **Microsoft Entra ID** (supporting both work/school and personal Microsoft accounts) and present a JWT bearer token, which the API validates against its Entra app registration before allowing access to `/api/products`. Health check endpoints (`/health`, `/health/ready`) stay unauthenticated for monitoring.
+
+6. **Cost control** — the SQL database uses Azure's **free-limit** offer with auto-pause, and the App Service runs on the **F1 (Free)** tier — the entire environment runs at effectively zero cost.
+
 ## Development
 
 ### Adding a New Endpoint
